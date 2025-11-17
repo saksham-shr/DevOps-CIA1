@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Academic Activity Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 2px solid #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header > div:first-child {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #555;
+            font-size: 16px;
+            margin: 3px 0;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 150px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            padding: 20px 0;
+            position: fixed;
+            height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+
+        .sidebar-item {
+            padding: 15px 20px;
+            color: #ecf0f1;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background-color: #34495e;
+            border-left-color: #3498db;
+        }
+
+        .sidebar-item.active {
+            background-color: #3498db;
+            border-left-color: #2980b9;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #229954;
+        }
+
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-add {
+            background-color: #27ae60;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+        }
+
+        .btn-add:hover {
+            background-color: #229954;
+        }
+
+        .btn-submit {
+            background-color: #2980b9;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin-top: 30px;
+        }
+
+        .btn-submit:hover {
+            background-color: #1f618d;
+        }
+
+        .dynamic-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+            position: relative;
+        }
+
+        .dynamic-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dynamic-section-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+
+        .file-upload {
+            border: 2px dashed #3498db;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #f0f7ff;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            background-color: #e3f2fd;
+            border-color: #2980b9;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-text {
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .file-upload-subtext {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .file-preview {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #27ae60;
+        }
+
+        .info-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .date-time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .char-counter {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .nav-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                display: flex;
+                overflow-x: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .date-time-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div>
+        <h1>Christ(Deemed to be University)</h1>
+        <p>School of Engineering and Technology</p>
+        <p>Department of AI, ML & Data Science</p>
+        </div>
+        <div style="text-align: right; margin-top: 10px;">
+            <a href="{{ url_for('dashboard') }}" style="color: #2c3e50; text-decoration: none; margin-right: 15px; font-weight: 600;">📊 Dashboard</a>
+            <a href="{{ url_for('logout') }}" style="color: #2c3e50; text-decoration: none; font-weight: 600;">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-item active" onclick="showSection('general-info')">
+                📋 General Information
+            </div>
+            <div class="sidebar-item" onclick="showSection('speaker-details')">
+                👤 Speaker/Guest Details
+            </div>
+            <div class="sidebar-item" onclick="showSection('participants')">
+                👥 Participants Profile
+            </div>
+            <div class="sidebar-item" onclick="showSection('synopsis')">
+                📝 Synopsis
+            </div>
+            <div class="sidebar-item" onclick="showSection('report-prepared')">
+                ✍️ Report Prepared By
+            </div>
+            <div class="sidebar-item" onclick="showSection('speaker-profile')">
+                🖼️ Speaker Profile
+            </div>
+            <div class="sidebar-item" onclick="showSection('activity-photos')">
+                📸 Activity Photos
+            </div>
+            <div class="sidebar-item" onclick="showSection('attendance-list')">
+                📄 Attendance List
+            </div>
+            <div class="sidebar-item" onclick="showSection('brochure')">
+                📑 Brochure
+            </div>
+            <div class="sidebar-item" onclick="showSection('notice-approval')">
+                📢 Notice for Approval
+            </div>
+            <div class="sidebar-item" onclick="showSection('feedback-analysis')">
+                🧾 Feedback Analysis
+            </div>
+            <div class="sidebar-item" onclick="showSection('impact-analysis')">
+                📊 Impact Analysis
+            </div>
+            <div class="sidebar-item" onclick="showSection('submit')">
+                ✅ Generate Report
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <form id="reportForm" method="POST" action="{{ url_for('report') }}" enctype="multipart/form-data">
+
+                <!-- 1. General Information Section -->
+                <div class="section active" id="general-info">
+                    <h2>General Information</h2>
+
+                    <div class="form-group">
+                        <label for="activityTitle" class="required">Title of the Activity</label>
+                        <input type="text" id="activityTitle" name="activityTitle" placeholder="Enter the title of the activity" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="activityType" class="required">Type of Activity</label>
+                        <select id="activityType" name="activityType" required onchange="updateSubcategories()">
+                            <option value="">-- Select --</option>
+                            <option value="Seminar">Seminar</option>
+                            <option value="Workshop">Workshop</option>
+                            <option value="Conference">Conference</option>
+                            <option value="Technical Talk">Technical Talk</option>
+                            <option value="Guest Talk">Guest Talk</option>
+                            <option value="Industry Visit">Industry Visit</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Cultural Competition">Cultural Competition</option>
+                            <option value="Technical fest">Technical fest / Academic fests</option>
+                            <option value="CAADS">CAADS</option>
+                            <option value="Research Clubs">Research Clubs / or any other Clubs</option>
+                            <option value="Newsletter">Newsletter</option>
+                            <option value="Alumni">Alumni</option>
+                            <option value="Faculty Development">Faculty Development Program</option>
+                            <option value="Quality Improvement">Quality Improvement Program</option>
+                            <option value="Refresher Course">Refresher Course</option>
+                            <option value="MoU">MoU</option>
+                            <option value="Outreach Activity">Outreach Activity</option>
+                            <option value="International Event">International Event</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subCategory" class="required">Sub Category</label>
+                        <select id="subCategory" name="subCategory" required>
+                            <option value="">-- Select --</option>
+                        </select>
+                        <input type="text" id="otherSubCategory" name="otherSubCategory" placeholder="Enter custom sub category" style="display:none; margin-top: 10px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Date and Time</label>
+                        <div class="date-time-row">
+                            <div>
+                                <label style="font-size: 12px; margin-bottom: 5px;">Start Date</label>
+                                <input type="date" name="startDate" required>
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; margin-bottom: 5px;">End Date</label>
+                                <input type="date" name="endDate" required>
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; margin-bottom: 5px;">Start Time</label>
+                                <input type="time" name="startTime" required>
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; margin-bottom: 5px;">End Time</label>
+                                <input type="time" name="endTime" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="venue" class="required">Venue</label>
+                        <input type="text" id="venue" name="venue" placeholder="Enter venue location" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="collaboration">Collaboration/Sponsor (if any)</label>
+                        <input type="text" id="collaboration" name="collaboration" placeholder="Enter collaboration or sponsor details">
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" disabled>← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('speaker-details')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('general-info')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 2. Speaker/Guest Details Section -->
+                <div class="section" id="speaker-details">
+                    <h2>Speaker/Guest/Presenter Details</h2>
+                    <div class="info-box">Add details for each speaker presenting at the activity. At least one speaker is required.</div>
+
+                    <button type="button" class="btn-add" onclick="addSpeaker()">+ Add Another Speaker</button>
+
+                    <div id="speakersContainer">
+                        <div class="dynamic-section" data-speaker-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Speaker 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeSpeaker(0)" style="display:none;">Remove</button>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="speaker-name-0" class="required">Name</label>
+                                <input type="text" id="speaker-name-0" name="speaker-name-0" placeholder="Enter speaker name" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="speaker-title-0" class="required">Title/Position</label>
+                                    <input type="text" id="speaker-title-0" name="speaker-title-0" placeholder="Enter title/position" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="speaker-org-0" class="required">Organization</label>
+                                    <input type="text" id="speaker-org-0" name="speaker-org-0" placeholder="Enter organization" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="speaker-contact-0">Contact Info</label>
+                                <input type="text" id="speaker-contact-0" name="speaker-contact-0" placeholder="Email or phone number">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="speaker-presentation-0" class="required">Title of Presentation</label>
+                                <input type="text" id="speaker-presentation-0" name="speaker-presentation-0" placeholder="Enter presentation title" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('general-info')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('participants')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('speaker-details')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 3. Participants Profile Section -->
+                <div class="section" id="participants">
+                    <h2>Participants Profile</h2>
+                    <div class="info-box">Add participant types and their counts. At least one participant type is required.</div>
+
+                    <div style="margin-bottom: 15px; padding: 12px; background-color: #e8f4f8; border-radius: 4px; color: #2c3e50; font-weight: 600;">
+                        Total Participants: <span id="totalParticipants">0</span>
+                    </div>
+
+                    <button type="button" class="btn-add" onclick="addParticipant()">+ Add Participant Type</button>
+
+                    <div id="participantsContainer">
+                        <div class="dynamic-section" data-participant-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Participant Type 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeParticipant(0)" style="display:none;">Remove</button>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="participant-type-0" class="required">Type of Participants</label>
+                                    <select id="participant-type-0" name="participant-type-0" required onchange="updateParticipantCount()">
+                                        <option value="">-- Select --</option>
+                                        <option value="Faculty">Faculty</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Research Scholar">Research Scholar</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="participant-count-0" class="required">Number of Participants</label>
+                                    <input type="number" id="participant-count-0" name="participant-count-0" min="1" placeholder="Enter count" required onchange="updateParticipantCount()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('speaker-details')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('synopsis')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('participants')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 4. Synopsis Section -->
+                <div class="section" id="synopsis">
+                    <h2>Synopsis of the Activity</h2>
+                    <div class="info-box" style="margin-bottom: 20px;">
+                        <strong>Formatting Options:</strong> For each field, you can choose to format as plain text, bullet points, or numbered list. 
+                        Enter each item on a new line for bullet/number formatting.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="highlights" class="required">Highlights of the Activity</label>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="highlights-format" value="plain" checked style="margin-right: 5px;">
+                                Plain Text
+                            </label>
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="highlights-format" value="bullet" style="margin-right: 5px;">
+                                Bullet Points
+                            </label>
+                            <label style="font-size: 13px; color: #555;">
+                                <input type="radio" name="highlights-format" value="numbered" style="margin-right: 5px;">
+                                Numbered List
+                            </label>
+                        </div>
+                        <textarea id="highlights" name="highlights" placeholder="Enter highlights (one per line for bullets/numbers)" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keyTakeaways" class="required">Key Takeaways</label>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="keyTakeaways-format" value="plain" checked style="margin-right: 5px;">
+                                Plain Text
+                            </label>
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="keyTakeaways-format" value="bullet" style="margin-right: 5px;">
+                                Bullet Points
+                            </label>
+                            <label style="font-size: 13px; color: #555;">
+                                <input type="radio" name="keyTakeaways-format" value="numbered" style="margin-right: 5px;">
+                                Numbered List
+                            </label>
+                        </div>
+                        <textarea id="keyTakeaways" name="keyTakeaways" placeholder="Enter key takeaways (one per line for bullets/numbers)" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="summary" class="required">Summary of the Activity</label>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="summary-format" value="plain" checked style="margin-right: 5px;">
+                                Plain Text
+                            </label>
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="summary-format" value="bullet" style="margin-right: 5px;">
+                                Bullet Points
+                            </label>
+                            <label style="font-size: 13px; color: #555;">
+                                <input type="radio" name="summary-format" value="numbered" style="margin-right: 5px;">
+                                Numbered List
+                            </label>
+                        </div>
+                        <textarea id="summary" name="summary" placeholder="Enter summary (one per line for bullets/numbers)" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="followUp" class="required">Follow-up Plan</label>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="followUp-format" value="plain" checked style="margin-right: 5px;">
+                                Plain Text
+                            </label>
+                            <label style="font-size: 13px; color: #555; margin-right: 15px;">
+                                <input type="radio" name="followUp-format" value="bullet" style="margin-right: 5px;">
+                                Bullet Points
+                            </label>
+                            <label style="font-size: 13px; color: #555;">
+                                <input type="radio" name="followUp-format" value="numbered" style="margin-right: 5px;">
+                                Numbered List
+                            </label>
+                        </div>
+                        <textarea id="followUp" name="followUp" placeholder="Enter follow-up plan (one per line for bullets/numbers)" required></textarea>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('participants')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('report-prepared')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('synopsis')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 5. Report Prepared By Section -->
+                <div class="section" id="report-prepared">
+                    <h2>Report Prepared By</h2>
+                    <div class="info-box">Add details for each person who prepared this report. At least one preparer is required.</div>
+
+                    <button type="button" class="btn-add" onclick="addPreparer()">+ Add Another Preparer</button>
+
+                    <div id="preparersContainer">
+                        <div class="dynamic-section" data-preparer-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Report Preparer 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removePreparer(0)" style="display:none;">Remove</button>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="preparer-name-0" class="required">Name</label>
+                                    <input type="text" id="preparer-name-0" name="preparer-name-0" placeholder="Enter preparer name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="preparer-designation-0" class="required">Designation</label>
+                                    <input type="text" id="preparer-designation-0" name="preparer-designation-0" placeholder="Enter designation" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preparer-signature-0" class="required">Digital Signature (Image)</label>
+                                
+                                {% if saved_signatures and saved_signatures|length > 0 %}
+                                <div style="margin-bottom: 15px;">
+                                    <label style="font-size: 13px; color: #555; margin-bottom: 8px; display: block;">Or select a saved signature:</label>
+                                    <select id="preparer-signature-saved-0" name="preparer-signature-saved-0" onchange="handleSavedSignatureSelect(0, this.value)" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                                        <option value="none">-- Use new upload --</option>
+                                        {% for sig in saved_signatures %}
+                                        <option value="{{ sig.id }}" {% if sig.is_default %}selected{% endif %}>{{ sig.signature_name }}{% if sig.is_default %} (Default){% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div id="preparer-signature-saved-preview-0" style="margin-top: 10px; text-align: center;"></div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="file-upload" onclick="document.getElementById('preparer-signature-0').click()">
+                                    <div class="file-upload-text">📁 Click to upload signature</div>
+                                    <div class="file-upload-subtext">JPG, PNG (max 10MB - will be auto-compressed)</div>
+                                    <input type="file" id="preparer-signature-0" name="preparer-signature-0" accept="image/*" onchange="handleFileUpload(this); const savedSel = document.getElementById('preparer-signature-saved-0'); if(savedSel) savedSel.value='none';">
+                                    <div class="file-preview" id="preparer-signature-0-preview"></div>
+                                </div>
+                                
+                                <div style="margin-top: 10px;">
+                                    <label style="font-size: 13px; display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="save-signature-0" name="save-signature-0" style="margin-right: 8px;">
+                                        <span>Save this signature for future use</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('synopsis')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('speaker-profile')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('report-prepared')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 6. Speaker Profile Section -->
+                <div class="section" id="speaker-profile">
+                    <h2>Speaker Profile</h2>
+
+                    <div class="form-group">
+                        <label for="speakerImage">Speaker Photo (Optional)</label>
+                        <div class="file-upload" onclick="document.getElementById('speakerImage').click()">
+                            <div class="file-upload-text">📁 Click to upload photo</div>
+                            <div class="file-upload-subtext">JPG, PNG (max 2MB)</div>
+                            <input type="file" id="speakerImage" name="speakerImage" accept="image/*" onchange="handleFileUpload(this)">
+                            <div class="file-preview" id="speakerImage-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="speakerBio">Speaker Profile Text (Max 1000 characters)</label>
+                        <textarea id="speakerBio" name="speakerBio" placeholder="Enter speaker biography or profile information" maxlength="1000" onkeyup="updateCharCounter(this)"></textarea>
+                        <div class="char-counter"><span id="charCount">0</span>/1000</div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('report-prepared')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('activity-photos')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('speaker-profile')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 7. Activity Photos Section -->
+                <div class="section" id="activity-photos">
+                    <h2>Activity Photos</h2>
+                    <div class="info-box">Upload at least 2 mandatory photos from the activity.</div>
+
+                    <div class="form-group">
+                        <label for="photo1" class="required">Photo 1 (Mandatory)</label>
+                        <div class="file-upload" onclick="document.getElementById('photo1').click()">
+                            <div class="file-upload-text">📁 Click to upload photo</div>
+                            <div class="file-upload-subtext">PDF, JPG, PNG (max 5MB - PDF pages converted to images)</div>
+                            <input type="file" id="photo1" name="photo1" accept=".pdf,image/*" required onchange="handleFileUpload(this)">
+                            <div class="file-preview" id="photo1-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo2" class="required">Photo 2 (Mandatory)</label>
+                        <div class="file-upload" onclick="document.getElementById('photo2').click()">
+                            <div class="file-upload-text">📁 Click to upload photo</div>
+                            <div class="file-upload-subtext">PDF, JPG, PNG (max 5MB - PDF pages converted to images)</div>
+                            <input type="file" id="photo2" name="photo2" accept=".pdf,image/*" required onchange="handleFileUpload(this)">
+                            <div class="file-preview" id="photo2-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo3">Photo 3 (Optional)</label>
+                        <div class="file-upload" onclick="document.getElementById('photo3').click()">
+                            <div class="file-upload-text">📁 Click to upload photo</div>
+                            <div class="file-upload-subtext">PDF, JPG, PNG (max 5MB - PDF pages converted to images)</div>
+                            <input type="file" id="photo3" name="photo3" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                            <div class="file-preview" id="photo3-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('speaker-profile')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('attendance-list')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('activity-photos')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 8. Attendance List Section -->
+                <div class="section" id="attendance-list">
+                    <h2>Attendance List 📄</h2>
+                    <div class="info-box">Upload attendance list documents (PDF or image). You can add multiple files.</div>
+
+                    <div id="attendanceListContainer">
+                        <div class="dynamic-section" data-attendance-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Attendance List 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeAttendanceItem(0)" style="display:none;">Remove</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="attendance-0">Upload File (PDF or Image)</label>
+                                <div class="file-upload" onclick="document.getElementById('attendance-0').click()">
+                                    <div class="file-upload-text">📁 Click to upload</div>
+                                    <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                                    <input type="file" id="attendance-0" name="attendance-0" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                                    <div class="file-preview" id="attendance-0-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-add" onclick="addAttendanceItem()">+ Add More</button>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('activity-photos')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('brochure')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('attendance-list')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 9. Brochure Section -->
+                <div class="section" id="brochure">
+                    <h2>Brochure 📑</h2>
+                    <div class="info-box">Upload brochure documents (PDF or image). You can add multiple files.</div>
+
+                    <div id="brochureContainer">
+                        <div class="dynamic-section" data-brochure-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Brochure 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeBrochureItem(0)" style="display:none;">Remove</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="brochure-0">Upload File (PDF or Image)</label>
+                                <div class="file-upload" onclick="document.getElementById('brochure-0').click()">
+                                    <div class="file-upload-text">📁 Click to upload</div>
+                                    <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                                    <input type="file" id="brochure-0" name="brochure-0" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                                    <div class="file-preview" id="brochure-0-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-add" onclick="addBrochureItem()">+ Add More</button>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('attendance-list')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('notice-approval')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('brochure')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 10. Notice for Approval Section -->
+                <div class="section" id="notice-approval">
+                    <h2>Notice for Approval 📢</h2>
+                    <div class="info-box">Upload notice for approval documents (PDF or image). You can add multiple files.</div>
+
+                    <div id="noticeContainer">
+                        <div class="dynamic-section" data-notice-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Notice 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeNoticeItem(0)" style="display:none;">Remove</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="notice-0">Upload File (PDF or Image)</label>
+                                <div class="file-upload" onclick="document.getElementById('notice-0').click()">
+                                    <div class="file-upload-text">📁 Click to upload</div>
+                                    <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                                    <input type="file" id="notice-0" name="notice-0" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                                    <div class="file-preview" id="notice-0-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-add" onclick="addNoticeItem()">+ Add More</button>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('brochure')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('feedback-analysis')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('notice-approval')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 11. Feedback Analysis Section -->
+                <div class="section" id="feedback-analysis">
+                    <h2>Feedback Analysis 🧾</h2>
+                    <div class="info-box">Upload feedback analysis documents (PDF or image). You can add multiple files.</div>
+
+                    <div id="feedbackContainer">
+                        <div class="dynamic-section" data-feedback-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Feedback Analysis 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeFeedbackItem(0)" style="display:none;">Remove</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="feedback-0">Upload File (PDF or Image)</label>
+                                <div class="file-upload" onclick="document.getElementById('feedback-0').click()">
+                                    <div class="file-upload-text">📁 Click to upload</div>
+                                    <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                                    <input type="file" id="feedback-0" name="feedback-0" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                                    <div class="file-preview" id="feedback-0-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-add" onclick="addFeedbackItem()">+ Add More</button>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('notice-approval')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('impact-analysis')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('feedback-analysis')">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <!-- 12. Impact Analysis Section -->
+                <div class="section" id="impact-analysis">
+                    <h2>Impact Analysis 📊</h2>
+                    <div class="info-box">Upload impact analysis documents (PDF or image). You can add multiple files.</div>
+
+                    <div id="impactContainer">
+                        <div class="dynamic-section" data-impact-index="0">
+                            <div class="dynamic-section-header">
+                                <span class="dynamic-section-title">Impact Analysis 1</span>
+                                <button type="button" class="btn btn-danger" onclick="removeImpactItem(0)" style="display:none;">Remove</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="impact-0">Upload File (PDF or Image)</label>
+                                <div class="file-upload" onclick="document.getElementById('impact-0').click()">
+                                    <div class="file-upload-text">📁 Click to upload</div>
+                                    <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                                    <input type="file" id="impact-0" name="impact-0" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                                    <div class="file-preview" id="impact-0-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-add" onclick="addImpactItem()">+ Add More</button>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('feedback-analysis')">← Previous</button>
+                        <button type="button" class="nav-btn" onclick="showSection('submit')">Next →</button>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft('impact-analysis')">💾 Save Draft</button>
+                    </div>
+                </div>
+                
+
+                <!-- 13. Submit Section -->
+                <div class="section" id="submit">
+                    <h2>Generate Report</h2>
+                    {% if draft_id and is_owner %}
+                    <div style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db;">
+                        <h3 style="margin-bottom: 10px; color: #2c3e50;">👥 Collaboration</h3>
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="font-size: 14px; margin-bottom: 8px;">Collaborators:</h4>
+                            {% if collaborators %}
+                                <ul style="margin-left: 20px; margin-bottom: 10px;">
+                                    {% for collab in collaborators %}
+                                    <li style="margin-bottom: 5px;">
+                                        {{ collab.email }}
+                                        <form method="POST" action="{{ url_for('remove_collaborator_route', draft_id=draft_id, user_id=collab.user_id) }}" style="display: inline; margin-left: 10px;">
+                                            <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Remove</button>
+                                        </form>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p style="color: #7f8c8d; font-size: 13px;">No collaborators yet.</p>
+                            {% endif %}
+                        </div>
+                        <form method="POST" action="{{ url_for('add_collaborator_route', draft_id=draft_id) }}" style="display: flex; gap: 10px;">
+                            <input type="email" name="email" placeholder="Enter collaborator email" required style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <button type="submit" style="background: #27ae60; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Add Collaborator</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    <div style="margin-bottom: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="generatePreview()" style="background: #9b59b6; margin-right: 10px;">👁️ Live Preview</button>
+                        <button type="submit" class="btn btn-primary">✅ Generate Report</button>
+                    </div>
+                    <div class="info-box">Review all information and click the button below to generate your PDF report.</div>
+
+                    <div style="margin: 20px 0; padding: 15px; background-color: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+                        <strong>✓ Before submitting, please ensure:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px; color: #2c3e50;">
+                            <li>All required fields are filled</li>
+                            <li>At least one speaker is added</li>
+                            <li>At least one participant type is added</li>
+                            <li>At least one report preparer is added</li>
+                            <li>At least 2 activity photos are uploaded</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn-submit">📄 Generate PDF Report</button>
+
+                    <div class="navigation-buttons">
+                        <button type="button" class="nav-btn" onclick="showSection('activity-photos')">← Previous</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2025 Academic Activity Report Generator | Christ University</p>
+    </div>
+
+    <script>
+        // Subcategory mapping
+        const subcategoryMap = {
+            'Seminar': ['Competitive Exam', 'Career Guidance', 'Skill Development', 'Communication Skills', 'Women Event', 'Emerging Trends and Technology', 'Life Skills', 'Soft Skills', 'Other'],
+            'Workshop': ['Skill Development', 'Communication Skills', 'Technical Skills', 'Life Skills', 'Soft Skills', 'Other'],
+            'Conference': ['Research', 'Industry', 'Academic', 'Other'],
+            'Technical Talk': ['Emerging Trends and Technology', 'Research', 'Industry', 'Other'],
+            'Guest Talk': ['Career Guidance', 'Emerging Trends and Technology', 'Life Skills', 'Other'],
+            'Industry Visit': ['Career Guidance', 'Skill Development', 'Industry', 'Other'],
+            'Sports': ['Sports', 'Competition', 'Other'],
+            'Cultural Competition': ['Cultural', 'Competition', 'Other'],
+            'Technical fest': ['Technical', 'Academic', 'Competition', 'Other'],
+            'CAADS': ['Research', 'Academic', 'Other'],
+            'Research Clubs': ['Research', 'Academic', 'Other'],
+            'Newsletter': ['Communication', 'Academic', 'Other'],
+            'Alumni': ['Alumni', 'Networking', 'Other'],
+            'Faculty Development': ['Professional Development', 'Skill Development', 'Other'],
+            'Quality Improvement': ['Quality', 'Improvement', 'Other'],
+            'Refresher Course': ['Skill Development', 'Professional Development', 'Other'],
+            'MoU': ['Collaboration', 'Partnership', 'Other'],
+            'Outreach Activity': ['Community', 'Social', 'Other'],
+            'International Event': ['International', 'Global', 'Other'],
+            'Other': ['Other']
+        };
+
+        let speakerCount = 1;
+        let participantCount = 1;
+        let preparerCount = 1;
+        let attendanceCount = 1;
+        let brochureCount = 1;
+        let noticeCount = 1;
+        let feedbackCount = 1;
+        let impactCount = 1;
+        
+        // Saved signatures data for JavaScript
+        const savedSignatures = {% if saved_signatures %}{{ saved_signatures|tojson|safe }}{% else %}[]{% endif %};
+
+        function updateSubcategories() {
+            const activityType = document.getElementById('activityType').value;
+            const subCategorySelect = document.getElementById('subCategory');
+            const otherInput = document.getElementById('otherSubCategory');
+
+            subCategorySelect.innerHTML = '<option value="">-- Select --</option>';
+
+            if (activityType && subcategoryMap[activityType]) {
+                subcategoryMap[activityType].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subCategorySelect.appendChild(option);
+                });
+            }
+
+            subCategorySelect.onchange = function() {
+                if (this.value === 'Other') {
+                    otherInput.style.display = 'block';
+                    otherInput.required = true;
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.required = false;
+                }
+            };
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all sidebar items
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+            }
+
+            // Add active class to corresponding sidebar item
+            const sidebarItem = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (sidebarItem) {
+                sidebarItem.classList.add('active');
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function addSpeaker() {
+            const container = document.getElementById('speakersContainer');
+            const newIndex = speakerCount;
+
+            const newSpeaker = document.createElement('div');
+            newSpeaker.className = 'dynamic-section';
+            newSpeaker.setAttribute('data-speaker-index', newIndex);
+            newSpeaker.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Speaker ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeSpeaker(${newIndex})">Remove</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="speaker-name-${newIndex}" class="required">Name</label>
+                    <input type="text" id="speaker-name-${newIndex}" name="speaker-name-${newIndex}" placeholder="Enter speaker name" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="speaker-title-${newIndex}" class="required">Title/Position</label>
+                        <input type="text" id="speaker-title-${newIndex}" name="speaker-title-${newIndex}" placeholder="Enter title/position" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="speaker-org-${newIndex}" class="required">Organization</label>
+                        <input type="text" id="speaker-org-${newIndex}" name="speaker-org-${newIndex}" placeholder="Enter organization" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="speaker-contact-${newIndex}">Contact Info</label>
+                    <input type="text" id="speaker-contact-${newIndex}" name="speaker-contact-${newIndex}" placeholder="Email or phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="speaker-presentation-${newIndex}" class="required">Title of Presentation</label>
+                    <input type="text" id="speaker-presentation-${newIndex}" name="speaker-presentation-${newIndex}" placeholder="Enter presentation title" required>
+                </div>
+            `;
+
+            container.appendChild(newSpeaker);
+            speakerCount++;
+        }
+
+        function removeSpeaker(index) {
+            const speaker = document.querySelector(`[data-speaker-index="${index}"]`);
+            if (speaker) {
+                speaker.remove();
+            }
+        }
+
+        function addParticipant() {
+            const container = document.getElementById('participantsContainer');
+            const newIndex = participantCount;
+
+            const newParticipant = document.createElement('div');
+            newParticipant.className = 'dynamic-section';
+            newParticipant.setAttribute('data-participant-index', newIndex);
+            newParticipant.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Participant Type ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeParticipant(${newIndex})">Remove</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="participant-type-${newIndex}" class="required">Type of Participants</label>
+                        <select id="participant-type-${newIndex}" name="participant-type-${newIndex}" required onchange="updateParticipantCount()">
+                            <option value="">-- Select --</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Student">Student</option>
+                            <option value="Research Scholar">Research Scholar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="participant-count-${newIndex}" class="required">Number of Participants</label>
+                        <input type="number" id="participant-count-${newIndex}" name="participant-count-${newIndex}" min="1" placeholder="Enter count" required onchange="updateParticipantCount()">
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(newParticipant);
+            participantCount++;
+        }
+
+        function removeParticipant(index) {
+            const participant = document.querySelector(`[data-participant-index="${index}"]`);
+            if (participant) {
+                participant.remove();
+            }
+            updateParticipantCount();
+        }
+
+        function updateParticipantCount() {
+            let total = 0;
+            const inputs = document.querySelectorAll('input[name^="participant-count-"]');
+            inputs.forEach(input => {
+                if (input.value) {
+                    total += parseInt(input.value) || 0;
+                }
+            });
+            document.getElementById('totalParticipants').textContent = total;
+        }
+
+        function addPreparer() {
+            const container = document.getElementById('preparersContainer');
+            const newIndex = preparerCount;
+
+            const newPreparer = document.createElement('div');
+            newPreparer.className = 'dynamic-section';
+            newPreparer.setAttribute('data-preparer-index', newIndex);
+            newPreparer.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Report Preparer ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removePreparer(${newIndex})">Remove</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="preparer-name-${newIndex}" class="required">Name</label>
+                        <input type="text" id="preparer-name-${newIndex}" name="preparer-name-${newIndex}" placeholder="Enter preparer name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="preparer-designation-${newIndex}" class="required">Designation</label>
+                        <input type="text" id="preparer-designation-${newIndex}" name="preparer-designation-${newIndex}" placeholder="Enter designation" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="preparer-signature-${newIndex}" class="required">Digital Signature (Image)</label>
+                    ${getSavedSignaturesHTML(newIndex)}
+                    <div class="file-upload" onclick="document.getElementById('preparer-signature-${newIndex}').click()">
+                        <div class="file-upload-text">📁 Click to upload signature</div>
+                        <div class="file-upload-subtext">JPG, PNG (max 10MB - will be auto-compressed)</div>
+                        <input type="file" id="preparer-signature-${newIndex}" name="preparer-signature-${newIndex}" accept="image/*" onchange="handleFileUpload(this); const savedSel = document.getElementById('preparer-signature-saved-${newIndex}'); if(savedSel) savedSel.value='none';">
+                        <div class="file-preview" id="preparer-signature-${newIndex}-preview"></div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size: 13px; display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="save-signature-${newIndex}" name="save-signature-${newIndex}" style="margin-right: 8px;">
+                            <span>Save this signature for future use</span>
+                        </label>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(newPreparer);
+            preparerCount++;
+        }
+
+        function removePreparer(index) {
+            const preparer = document.querySelector(`[data-preparer-index="${index}"]`);
+            if (preparer) {
+                preparer.remove();
+            }
+        }
+
+        function getSavedSignaturesHTML(index) {
+            if (!savedSignatures || savedSignatures.length === 0) {
+                return '';
+            }
+            let html = '<div style="margin-bottom: 15px;"><label style="font-size: 13px; color: #555; margin-bottom: 8px; display: block;">Or select a saved signature:</label><select id="preparer-signature-saved-' + index + '" name="preparer-signature-saved-' + index + '" onchange="handleSavedSignatureSelect(' + index + ', this.value)" style="width: 100%; padding: 8px; margin-bottom: 10px;"><option value="none">-- Use new upload --</option>';
+            savedSignatures.forEach(function(sig) {
+                html += '<option value="' + sig.id + '"' + (sig.is_default ? ' selected' : '') + '>' + sig.signature_name + (sig.is_default ? ' (Default)' : '') + '</option>';
+            });
+            html += '</select><div id="preparer-signature-saved-preview-' + index + '" style="margin-top: 10px; text-align: center;"></div></div>';
+            return html;
+        }
+
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileName = file.name;
+                const fileSize = (file.size / 1024).toFixed(2); // KB
+
+                const previewId = input.id + '-preview';
+                const preview = document.getElementById(previewId);
+
+                if (preview) {
+                    preview.innerHTML = `<span class="success-message">✓ ${fileName} (${fileSize} KB)</span>`;
+                }
+            }
+        }
+
+        function updateCharCounter(textarea) {
+            const count = textarea.value.length;
+            document.getElementById('charCount').textContent = count;
+        }
+
+        // New section functions
+        function addAttendanceItem() {
+            const container = document.getElementById('attendanceListContainer');
+            const newIndex = attendanceCount;
+            const newItem = document.createElement('div');
+            newItem.className = 'dynamic-section';
+            newItem.setAttribute('data-attendance-index', newIndex);
+            newItem.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Attendance List ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeAttendanceItem(${newIndex})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label for="attendance-${newIndex}">Upload File (PDF or Image)</label>
+                    <div class="file-upload" onclick="document.getElementById('attendance-${newIndex}').click()">
+                        <div class="file-upload-text">📁 Click to upload</div>
+                        <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                        <input type="file" id="attendance-${newIndex}" name="attendance-${newIndex}" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                        <div class="file-preview" id="attendance-${newIndex}-preview"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            attendanceCount++;
+        }
+
+        function removeAttendanceItem(index) {
+            const item = document.querySelector(`[data-attendance-index="${index}"]`);
+            if (item) item.remove();
+        }
+
+        function addBrochureItem() {
+            const container = document.getElementById('brochureContainer');
+            const newIndex = brochureCount;
+            const newItem = document.createElement('div');
+            newItem.className = 'dynamic-section';
+            newItem.setAttribute('data-brochure-index', newIndex);
+            newItem.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Brochure ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeBrochureItem(${newIndex})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label for="brochure-${newIndex}">Upload File (PDF or Image)</label>
+                    <div class="file-upload" onclick="document.getElementById('brochure-${newIndex}').click()">
+                        <div class="file-upload-text">📁 Click to upload</div>
+                        <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                        <input type="file" id="brochure-${newIndex}" name="brochure-${newIndex}" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                        <div class="file-preview" id="brochure-${newIndex}-preview"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            brochureCount++;
+        }
+
+        function removeBrochureItem(index) {
+            const item = document.querySelector(`[data-brochure-index="${index}"]`);
+            if (item) item.remove();
+        }
+
+        function addNoticeItem() {
+            const container = document.getElementById('noticeContainer');
+            const newIndex = noticeCount;
+            const newItem = document.createElement('div');
+            newItem.className = 'dynamic-section';
+            newItem.setAttribute('data-notice-index', newIndex);
+            newItem.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Notice ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeNoticeItem(${newIndex})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label for="notice-${newIndex}">Upload File (PDF or Image)</label>
+                    <div class="file-upload" onclick="document.getElementById('notice-${newIndex}').click()">
+                        <div class="file-upload-text">📁 Click to upload</div>
+                        <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                        <input type="file" id="notice-${newIndex}" name="notice-${newIndex}" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                        <div class="file-preview" id="notice-${newIndex}-preview"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            noticeCount++;
+        }
+
+        function removeNoticeItem(index) {
+            const item = document.querySelector(`[data-notice-index="${index}"]`);
+            if (item) item.remove();
+        }
+
+        function addFeedbackItem() {
+            const container = document.getElementById('feedbackContainer');
+            const newIndex = feedbackCount;
+            const newItem = document.createElement('div');
+            newItem.className = 'dynamic-section';
+            newItem.setAttribute('data-feedback-index', newIndex);
+            newItem.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Feedback Analysis ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeFeedbackItem(${newIndex})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label for="feedback-${newIndex}">Upload File (PDF or Image)</label>
+                    <div class="file-upload" onclick="document.getElementById('feedback-${newIndex}').click()">
+                        <div class="file-upload-text">📁 Click to upload</div>
+                        <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                        <input type="file" id="feedback-${newIndex}" name="feedback-${newIndex}" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                        <div class="file-preview" id="feedback-${newIndex}-preview"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            feedbackCount++;
+        }
+
+        function removeFeedbackItem(index) {
+            const item = document.querySelector(`[data-feedback-index="${index}"]`);
+            if (item) item.remove();
+        }
+
+        function addImpactItem() {
+            const container = document.getElementById('impactContainer');
+            const newIndex = impactCount;
+            const newItem = document.createElement('div');
+            newItem.className = 'dynamic-section';
+            newItem.setAttribute('data-impact-index', newIndex);
+            newItem.innerHTML = `
+                <div class="dynamic-section-header">
+                    <span class="dynamic-section-title">Impact Analysis ${newIndex + 1}</span>
+                    <button type="button" class="btn btn-danger" onclick="removeImpactItem(${newIndex})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label for="impact-${newIndex}">Upload File (PDF or Image)</label>
+                    <div class="file-upload" onclick="document.getElementById('impact-${newIndex}').click()">
+                        <div class="file-upload-text">📁 Click to upload</div>
+                        <div class="file-upload-subtext">PDF, JPG, PNG (max 10MB)</div>
+                        <input type="file" id="impact-${newIndex}" name="impact-${newIndex}" accept=".pdf,image/*" onchange="handleFileUpload(this)">
+                        <div class="file-preview" id="impact-${newIndex}-preview"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+            impactCount++;
+        }
+
+        function removeImpactItem(index) {
+            const item = document.querySelector(`[data-impact-index="${index}"]`);
+            if (item) item.remove();
+        }
+
+        function handleSavedSignatureSelect(index, signatureId) {
+            const previewDiv = document.getElementById(`preparer-signature-saved-preview-${index}`);
+            if (!previewDiv) return;
+            
+            if (signatureId === 'none' || !signatureId) {
+                previewDiv.innerHTML = '';
+                return;
+            }
+            // Show preview of selected signature
+            previewDiv.innerHTML = '<span class="success-message">✓ Using saved signature</span>';
+        }
+
+        function saveDraft(sectionId) {
+            const form = document.getElementById('reportForm');
+            const formData = new FormData(form);
+            formData.append('action', 'save_draft');
+            formData.append('section', sectionId);
+
+            fetch('/save_draft', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Draft saved successfully!');
+                } else {
+                    alert('Error saving draft: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving draft. Please try again.');
+            });
+        }
+
+        // Live Preview Function
+        function generatePreview() {
+            const form = document.getElementById('reportForm');
+            const formData = new FormData(form);
+            formData.append('action', 'preview');
+            
+            // Show loading
+            const previewModal = document.getElementById('previewModal');
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Generating preview...</p></div>';
+            previewModal.style.display = 'block';
+            
+            fetch('/preview-report', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    previewContent.innerHTML = `
+                        <iframe src="data:application/pdf;base64,${data.pdf}" style="width: 100%; height: 80vh; border: none;"></iframe>
+                        <div style="margin-top: 15px; text-align: center;">
+                            <button onclick="document.getElementById('previewModal').style.display='none'" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Close Preview</button>
+                        </div>
+                    `;
+                } else {
+                    previewContent.innerHTML = `
+                        <div style="padding: 20px; color: #e74c3c;">
+                            <h3>Error generating preview</h3>
+                            <p>${data.error || 'Unknown error occurred'}</p>
+                            <button onclick="document.getElementById('previewModal').style.display='none'" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Close</button>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                previewContent.innerHTML = `
+                    <div style="padding: 20px; color: #e74c3c;">
+                        <h3>Error generating preview</h3>
+                        <p>${error.message}</p>
+                        <button onclick="document.getElementById('previewModal').style.display='none'" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Close</button>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load draft data if available
+        {% if draft_data %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const draftData = {{ draft_data|tojson|safe }};
+            
+            // Load synopsis format options
+            if (draftData['highlights-format']) {
+                document.querySelector(`input[name="highlights-format"][value="${draftData['highlights-format']}"]`).checked = true;
+            }
+            if (draftData['keyTakeaways-format']) {
+                document.querySelector(`input[name="keyTakeaways-format"][value="${draftData['keyTakeaways-format']}"]`).checked = true;
+            }
+            if (draftData['summary-format']) {
+                document.querySelector(`input[name="summary-format"][value="${draftData['summary-format']}"]`).checked = true;
+            }
+            if (draftData['followUp-format']) {
+                document.querySelector(`input[name="followUp-format"][value="${draftData['followUp-format']}"]`).checked = true;
+            }
+        });
+        {% endif %}
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSubcategories();
+        });
+    </script>
+    
+    <!-- Preview Modal -->
+    <div id="previewModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+        <div style="background-color: white; margin: 2% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 1200px; max-height: 90vh; overflow: auto; position: relative;">
+            <span onclick="document.getElementById('previewModal').style.display='none'" style="position: absolute; right: 20px; top: 20px; font-size: 28px; font-weight: bold; color: #aaa; cursor: pointer;">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">Report Preview</h2>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+</body>
+</html>
