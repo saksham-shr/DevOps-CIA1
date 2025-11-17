@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .user-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .drafts-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .draft-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .draft-info h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .draft-info p {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        .draft-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: #efe;
+            border-left: 4px solid #27ae60;
+            color: #229954;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Report Generator Dashboard</h1>
+        <div class="user-info">
+            <span>Welcome, {{ current_user.email }}</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div style="margin-bottom: 20px;">
+            <a href="{{ url_for('new_report') }}" class="btn btn-primary">➕ Start New Report</a>
+            <a href="{{ url_for('my_locations') }}" class="btn btn-primary">📍 My Login Locations</a>
+            {% if is_admin %}
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-primary" style="background: #e74c3c;">🔐 Admin Panel</a>
+            {% endif %}
+        </div>
+        
+        <div class="drafts-section">
+            <h2>Your Saved Drafts</h2>
+            {% if drafts %}
+                {% for draft in drafts %}
+                    <div class="draft-item">
+                        <div class="draft-info">
+                            <h3>{{ draft.draft_name }}</h3>
+                            <p>Last updated: {{ draft.updated_at }}</p>
+                        </div>
+                        <div class="draft-actions">
+                            <a href="{{ url_for('load_draft', draft_id=draft.id) }}" class="btn btn-primary">Continue</a>
+                            <form method="POST" action="{{ url_for('delete_draft_route', draft_id=draft.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this draft?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No saved drafts yet. Start a new report to begin!</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if collaborative_drafts %}
+        <div class="drafts-section" style="margin-top: 30px;">
+            <h2>Collaborative Drafts (Shared with You)</h2>
+            {% for draft in collaborative_drafts %}
+                <div class="draft-item">
+                    <div class="draft-info">
+                        <h3>{{ draft.draft_name }}</h3>
+                        <p>Owner: {{ draft.owner_email }} | Last updated: {{ draft.updated_at }}</p>
+                    </div>
+                    <div class="draft-actions">
+                        <a href="{{ url_for('load_draft', draft_id=draft.id) }}" class="btn btn-primary">Continue</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+

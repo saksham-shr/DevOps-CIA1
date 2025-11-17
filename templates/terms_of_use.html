@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Use - Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('landing') }}" class="back-link">← Back to Home</a>
+        <h1>Terms of Use</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Important:</strong> By using this system, you agree to these terms. Violation may result in account suspension or termination.
+        </div>
+        
+        <h2>1. Authorized Use</h2>
+        <p>This Report Generator is exclusively for:</p>
+        <ul>
+            <li>Faculty members of the Department of AI, ML & Data Science</li>
+            <li>Authorized personnel with whitelisted email addresses</li>
+            <li>Academic activity report generation only</li>
+        </ul>
+        
+        <h2>2. Prohibited Activities</h2>
+        <p>The following activities are strictly prohibited:</p>
+        <ul>
+            <li>Sharing login credentials with unauthorized persons</li>
+            <li>Allowing access to users from other departments</li>
+            <li>Using the system for non-academic purposes</li>
+            <li>Attempting to bypass security measures</li>
+            <li>Uploading malicious files or content</li>
+            <li>Any activity that violates institutional policies</li>
+        </ul>
+        
+        <h2>3. Account Security</h2>
+        <p>You are responsible for:</p>
+        <ul>
+            <li>Maintaining the confidentiality of your password</li>
+            <li>Not sharing your credentials with anyone</li>
+            <li>Reporting any suspicious activity immediately</li>
+            <li>Using strong, unique passwords</li>
+        </ul>
+        
+        <h2>4. Device Monitoring</h2>
+        <p>The system monitors:</p>
+        <ul>
+            <li>Device information and login locations</li>
+            <li>New device logins (administrators are notified)</li>
+            <li>Login patterns and session data</li>
+        </ul>
+        <p><strong>Warning:</strong> Logging in from a new device will trigger a security alert. Repeated logins from unauthorized devices may result in account suspension.</p>
+        
+        <h2>5. Data Responsibility</h2>
+        <p>You are responsible for:</p>
+        <ul>
+            <li>Ensuring accuracy of report data</li>
+            <li>Maintaining backups of important drafts</li>
+            <li>Not uploading sensitive or confidential information inappropriately</li>
+        </ul>
+        
+        <h2>6. System Availability</h2>
+        <p>The system is provided "as is" and we do not guarantee:</p>
+        <ul>
+            <li>Uninterrupted availability</li>
+            <li>Data loss prevention (users should maintain backups)</li>
+            <li>Compatibility with all devices or browsers</li>
+        </ul>
+        
+        <h2>7. Violations and Consequences</h2>
+        <p>Violations of these terms may result in:</p>
+        <ul>
+            <li>Immediate account suspension</li>
+            <li>Permanent account termination</li>
+            <li>Reporting to institutional authorities</li>
+            <li>Legal action if applicable</li>
+        </ul>
+        
+        <h2>8. Changes to Terms</h2>
+        <p>These terms may be updated at any time. Continued use of the system constitutes acceptance of updated terms.</p>
+        
+        <h2>9. Contact</h2>
+        <p>For questions or concerns about these terms, please contact the system administrator.</p>
+        
+        <p><em>Last updated: November 2025</em></p>
+    </div>
+</body>
+</html>
+

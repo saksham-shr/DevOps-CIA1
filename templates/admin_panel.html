@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-warning {
+            background: #e67e22;
+            color: white;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .admin-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+        }
+        .admin-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .admin-card p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .admin-card ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+        .admin-card ul li {
+            margin-bottom: 8px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h4 {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .stat-card .stat-value {
+            color: #2c3e50;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid #3498db;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔐 Admin Panel</h1>
+        <div>
+            <a href="{{ url_for('dashboard') }}" class="btn" style="background: white; color: #e74c3c;">← Back to Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="alert alert-info">
+            <strong>Admin Access:</strong> You are logged in as <strong>{{ current_user.email }}</strong>. 
+            This is the admin panel where you can monitor system activity and manage security.
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Users</h4>
+                <div class="stat-value">{{ total_users }}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Total Drafts</h4>
+                <div class="stat-value">{{ total_drafts }}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Login Sessions</h4>
+                <div class="stat-value">{{ total_sessions }}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Unauthorized Attempts</h4>
+                <div class="stat-value">{{ unauthorized_count }}</div>
+            </div>
+        </div>
+        
+        <div class="admin-grid">
+            <div class="admin-card">
+                <h3>📍 Location Monitoring</h3>
+                <p>View all user login locations and track where users are accessing the system from.</p>
+                <ul>
+                    <li>View all user login sessions</li>
+                    <li>See IP addresses and locations</li>
+                    <li>Track device information</li>
+                    <li>View login timestamps</li>
+                </ul>
+                <a href="{{ url_for('admin_locations') }}" class="btn btn-primary">View All Locations →</a>
+            </div>
+            
+            <div class="admin-card">
+                <h3>⚠️ Security Monitoring</h3>
+                <p>Monitor unauthorized access attempts and potential security threats.</p>
+                <ul>
+                    <li>View unauthorized login attempts</li>
+                    <li>Track registration from non-whitelisted emails</li>
+                    <li>See IP addresses and locations</li>
+                    <li>Monitor suspicious activity</li>
+                </ul>
+                <a href="{{ url_for('admin_unauthorized_access') }}" class="btn btn-warning">View Security Logs →</a>
+            </div>
+            
+            <div class="admin-card">
+                <h3>👥 User Management</h3>
+                <p>Manage user accounts and access.</p>
+                <ul>
+                    <li>View all registered users</li>
+                    <li>Monitor user activity</li>
+                    <li>Track user drafts and reports</li>
+                </ul>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-success">Manage Users →</a>
+            </div>
+            
+            <div class="admin-card">
+                <h3>📊 System Statistics</h3>
+                <p>View system-wide statistics and analytics.</p>
+                <ul>
+                    <li>Total reports generated</li>
+                    <li>Active users</li>
+                    <li>System usage trends</li>
+                </ul>
+                <a href="{{ url_for('admin_stats') }}" class="btn btn-primary">View Statistics →</a>
+            </div>
+        </div>
+        
+        <div style="background: white; border-radius: 8px; padding: 25px; margin-top: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">Quick Actions</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">📋 Dashboard</a>
+                <a href="{{ url_for('new_report') }}" class="btn btn-success">➕ New Report</a>
+                <a href="{{ url_for('my_locations') }}" class="btn btn-primary">📍 My Locations</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

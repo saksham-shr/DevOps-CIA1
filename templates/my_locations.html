@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Login Locations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .session-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .session-title {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .session-time {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .session-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            color: #2c3e50;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-new {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-known {
+            background: #d4edda;
+            color: #155724;
+        }
+        .location-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .location-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📍 My Login Locations</h1>
+        <div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">Your Recent Login Sessions</h2>
+        
+        {% for session in sessions %}
+        <div class="session-card">
+            <div class="session-header">
+                <div class="session-title">
+                    {% if session.is_new_device %}
+                        <span class="badge badge-new">New Device</span>
+                    {% else %}
+                        <span class="badge badge-known">Known Device</span>
+                    {% endif %}
+                    Login Session
+                </div>
+                <div class="session-time">{{ session.login_time }}</div>
+            </div>
+            
+            <div class="session-details">
+                <div class="detail-item">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value">
+                        {% if session.location_lat and session.location_lon %}
+                            <a href="https://www.google.com/maps?q={{ session.location_lat }},{{ session.location_lon }}" 
+                               target="_blank" class="location-link">
+                                {{ session.location_str }}
+                            </a>
+                        {% else %}
+                            {{ session.location_str }}
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">IP Address</span>
+                    <span class="detail-value">{{ session.ip_address }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">ISP</span>
+                    <span class="detail-value">{{ session.location_isp or 'Unknown' }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Device</span>
+                    <span class="detail-value" style="font-size: 12px;">
+                        {{ session.device_info[:60] }}{% if session.device_info|length > 60 %}...{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        {% if sessions|length == 0 %}
+        <div style="text-align: center; padding: 40px; background: white; border-radius: 8px;">
+            <p style="color: #7f8c8d;">No login sessions found yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unauthorized Access Logs - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #e67e22;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 24px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            background: #3498db;
+            color: white;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #e67e22;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+        .warning-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Unauthorized Access Logs</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <p style="margin-bottom: 20px; color: #555;">
+            This page shows all unauthorized access attempts (users not in the whitelist).
+        </p>
+        
+        {% if logs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>IP Address</th>
+                    <th>Location</th>
+                    <th>Action</th>
+                    <th>User Agent</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td><strong>{{ log.email }}</strong></td>
+                    <td>{{ log.ip_address }}</td>
+                    <td>
+                        {% if log.location_city %}
+                            {{ log.location_city }}, {{ log.location_country }}
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+                    <td><span class="warning-badge">{{ log.action }}</span></td>
+                    <td style="font-size: 11px; max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ log.user_agent }}</td>
+                    <td>{{ log.attempt_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="background: white; padding: 40px; text-align: center; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <p style="color: #7f8c8d; font-size: 18px;">No unauthorized access attempts logged yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+

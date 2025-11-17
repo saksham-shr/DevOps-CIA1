@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Report Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('landing') }}" class="back-link">← Back to Home</a>
+        <h1>Privacy Policy</h1>
+        
+        <h2>1. Restricted Access</h2>
+        <p>This Report Generator system is exclusively for use by authorized faculty members of the Department of AI, ML & Data Science at Christ (Deemed to be University). Access is restricted to whitelisted email addresses only.</p>
+        
+        <h2>2. Data Collection</h2>
+        <p>We collect the following information:</p>
+        <ul>
+            <li>Email addresses for authentication</li>
+            <li>Report data and drafts created by users</li>
+            <li>Device information and login sessions for security monitoring</li>
+            <li>IP addresses for security and audit purposes</li>
+        </ul>
+        
+        <h2>3. Data Usage</h2>
+        <p>Your data is used solely for:</p>
+        <ul>
+            <li>Generating academic activity reports</li>
+            <li>Maintaining draft reports for your convenience</li>
+            <li>Security monitoring to prevent unauthorized access</li>
+            <li>Audit trails for compliance purposes</li>
+        </ul>
+        
+        <h2>4. Data Security</h2>
+        <p>We implement security measures including:</p>
+        <ul>
+            <li>Password hashing for secure authentication</li>
+            <li>Device fingerprinting to detect unauthorized access</li>
+            <li>Session tracking for security monitoring</li>
+            <li>Secure file storage for uploaded documents</li>
+        </ul>
+        
+        <h2>5. Device Monitoring</h2>
+        <p>For security purposes, we track:</p>
+        <ul>
+            <li>Device information and browser details</li>
+            <li>IP addresses</li>
+            <li>Login times and sessions</li>
+            <li>New device logins (administrators are notified)</li>
+        </ul>
+        <p><strong>Important:</strong> Sharing your credentials with unauthorized persons is strictly prohibited. New device logins are monitored and may result in account suspension if suspicious activity is detected.</p>
+        
+        <h2>6. Data Retention</h2>
+        <p>Draft reports and user data are retained until deleted by the user or as required by institutional policies.</p>
+        
+        <h2>7. Contact</h2>
+        <p>For privacy concerns, please contact the system administrator.</p>
+        
+        <p><em>Last updated: November 2025</em></p>
+    </div>
+</body>
+</html>
+

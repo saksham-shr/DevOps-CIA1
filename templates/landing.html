@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Generator - Landing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-secondary {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #229954;
+        }
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer-links {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .footer-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            background: #fee;
+            border-left: 4px solid #e74c3c;
+            color: #c0392b;
+        }
+        .alert-success {
+            background: #efe;
+            border-left: 4px solid #27ae60;
+            color: #229954;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Academic Activity Report Generator</h1>
+        <p class="subtitle">Christ (Deemed to be University) - Department of AI, ML & Data Science</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="info-box">
+            <strong>📋 System Information:</strong> This system is designed for academic activity report generation. All access is monitored and logged for security purposes.
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">About This Software</h3>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 10px;">
+                The Academic Activity Report Generator is a comprehensive web-based system designed to streamline the creation of professional activity reports for the Department of AI, ML & Data Science. This tool enables faculty members to efficiently document academic activities, workshops, seminars, and events with a user-friendly interface.
+            </p>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 10px;">
+                <strong>Key Features:</strong>
+            </p>
+            <ul style="color: #555; line-height: 1.8; margin-left: 20px; margin-bottom: 10px;">
+                <li>Multi-section form with intuitive navigation</li>
+                <li>Automatic PDF report generation</li>
+                <li>Draft saving and management</li>
+                <li>Digital signature storage and reuse</li>
+                <li>Support for multiple file uploads (images and PDFs)</li>
+                <li>Secure authentication and access control</li>
+                <li>Location tracking for security monitoring</li>
+            </ul>
+        </div>
+        
+        <div style="background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left; border-left: 4px solid #3498db;">
+            
+            <p style="color: #555; line-height: 1.6; margin-bottom: 10px;">
+                <strong>Contributors:</strong><br>
+                • Saksham Sharma - 2262251 (Data Science)<br>
+                • Mudassir Alam N - 226(AIML)<br>
+                • Cephas Lepcha - 2263009(AIML)
+            </p>
+            <p style="color: #555; line-height: 1.6; font-size: 14px;">
+                Developed by the students of  Department of AI, ML & Data Science. 
+                This Academic Activity Report Generator was developed as part of the innovation initiatives at Christ (Deemed to be University), 
+                specifically designed to meet the reporting needs of the Department of AI, ML & Data Science.
+            </p>
+        </div>
+        
+        <div class="button-group">
+            <a href="{{ url_for('login') }}" class="btn btn-primary">🔐 Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">📝 Register (First Time)</a>
+        </div>
+        
+        <div class="footer-links">
+            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+            <a href="{{ url_for('terms_of_use') }}">Terms of Use</a>
+            <a href="{{ url_for('contact') }}">Contact & Help</a>
+        </div>
+    </div>
+</body>
+</html>
+
